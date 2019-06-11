@@ -108,7 +108,7 @@ def handle_client(clientsocket, address):
 if __name__ == '__main__':
 	print_time('LB Started')
 	print_time('Connecting to servers')
-	server_sock = socket.socket()
+	server_sock = socket.socket(7)
 	server_sock.bind(('10.0.0.1', 80))
 	server_sock.listen()
 
