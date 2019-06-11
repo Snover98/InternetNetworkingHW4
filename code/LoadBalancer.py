@@ -19,26 +19,7 @@ def print_time(string):
 
 def createSocket(addr, port):
 	for af, socktype, proto, canonname, sa in socket.getaddrinfo(addr, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
-		try:
-			new_sock = socket.socket(af, socktype, proto)
-		except socket.error as msg:
-			print_time(msg)
-			new_sock = None
-			continue
-		else:
-			try:
-				new_sock.connect(sa)
-			except socket.error as msg:
-				print_time(msg)
-				new_sock.close()
-				new_sock = None
-				continue
-			else:
-				break
-
-	if new_sock is None:
-		print_time('could not open socket')
-		sys.exit(1)
+                new_sock = socket.socket(af, socktype, proto)
 	return new_sock
 
 
@@ -91,34 +72,59 @@ class Servers:
 
 servers_handler = Servers(servers, servers_work)
 
-class LoadBalancerRequestHandler(socketserver.BaseRequestHandler):
+#class LoadBalancerRequestHandler(socketserver.BaseRequestHandler):
 
-	def handle(self):
-		global servers_handler
-		
-		client_sock = self.request
-		req = client_sock.recv(2)
-		req_type, req_time = req[0], req[1]
-		serv_name = servers_handler.get_req_server(req_type, req_time)
-		print_time('recieved request %s from %s, sending to %s' % (req, self.client_address[0], servers_handler.get_server_addr(serv_name)))
-		serv_sock = servers_handler.get_server_socket(serv_name)
-		serv_sock.sendall(req)
-		data = serv_sock.recv(2)
-		servers_handler.remove_time(serv_name)
-		client_sock.sendall(data)
-		client_sock.close()
+#	def handle(self):
+#		global servers_handler
+#		
+#		req = client_sock.recv(2)
+#		req_type, req_time = req[0], req[1]
+#		serv_name = servers_handler.get_req_server(req_type, req_time)
+#		print_time('recieved request %s from %s, sending to %s' % (req, self.client_address[0], servers_handler.get_server_addr(serv_name)))
+#		serv_sock = servers_handler.get_server_socket(serv_name)
+#		serv_sock.sendall(req)
+#		data = serv_sock.recv(2)
+#		servers_handler.remove_time(serv_name)
+#		client_sock.sendall(data)
+#		client_sock.close()
 
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-	pass
+def handle_client(clientsocket, address):
+        msg = clientsocket.recv(1024)
+        req_type = msg[0]
+        req_time = msg[1]
+        serv_name = servers_handler.get_req_server(req_type, req_time)
+	print_time('recieved request %s from %s, sending to %s' % (req, self.client_address[0], servers_handler.get_server_addr(serv_name)))
+	serv_sock = servers_handler.get_server_socket(serv_name)
+	serv_sock.sendall(req)
+	data = serv_sock.recv(2)
+	servers_handler.remove_time(serv_name)
+	client_sock.sendall(data)
+	client_sock.close()
+
+        os._exit(0)
 
 
 if __name__ == '__main__':
-	try:
-		print_time('LB Started')
-		print_time('Connecting to servers')
+        print_time('LB Started')
+	print_time('Connecting to servers')
+	server_sock = socket.socket()
+	server_sock.bind('10.0.0.1')
+	server_sock.listen()
 
-		server = ThreadedTCPServer((SERV_HOST, HTTP_PORT), LoadBalancerRequestHandler)
-		server.serve_forever()
-	except socket.error as msg:
-		print_time(msg)
+	while True:
+                clientsocket, address = server_sock.accept()
+                thread_id = os.fork()
+                if thread_id == 0:
+                        handle_client(clientsocket, address)
+
+
+
+
+
+
+
+
+
+
+	
