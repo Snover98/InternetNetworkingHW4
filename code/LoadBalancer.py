@@ -90,9 +90,9 @@ servers_handler = Servers(servers, servers_work)
 
 
 def handle_client(clientsocket, address):
-	msg = clientsocket.recv(1024)
-	req_type = msg[0]
-	req_time = msg[1]
+	req = clientsocket.recv(1024)
+	req_type = req[0]
+	req_time = req[1]
 	serv_name = servers_handler.get_req_server(req_type, req_time)
 	print_time('recieved request %s from %s, sending to %s' % (req, self.client_address[0], servers_handler.get_server_addr(serv_name)))
 	serv_sock = servers_handler.get_server_socket(serv_name)
