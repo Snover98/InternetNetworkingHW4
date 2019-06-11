@@ -113,7 +113,7 @@ class ClientThread(threading.Thread):
 		self.client_sock = client_sock
 		self.address = address
 		self.servers_handler = servers_handler
-      
+		
 	def run(self):
 		handle_client(self.client_sock, self.address, self.servers_handler)
 
