@@ -1,6 +1,5 @@
 import socket, socketserver, sys, time, threading, os
 from collections import deque
-from multiprocessing import Process, Lock
 HTTP_PORT = 80
 # previous_server = 3
 # lock = threading.Lock()
@@ -50,7 +49,7 @@ class Servers:
 		
 		self.servers = {s_name: (servers_dict[s_name][0], createSocket(servers_dict[s_name][0], HTTP_PORT)) for s_name in servers_dict}
 		
-		self.lock = Lock()
+		self.lock = threading.Lock()
 		self.loads = {s_name: 0 for s_name in servers_dict}
 		self.queues = {s_name: deque() for s_name in servers_dict}
 	
@@ -108,7 +107,7 @@ class Servers:
 
 
 def handle_client(client_sock, address, servers_handler):
-	req = client_sock.recv(1024)
+	req = clientsocket.recv(1024)
 	msg = req.decode('utf-8')
 	req_type = msg[0]
 	req_time = int(msg[1])
@@ -121,7 +120,7 @@ def handle_client(client_sock, address, servers_handler):
 	client_sock.sendall(data)
 	client_sock.close()
 
-	#os._exit(0)
+	os._exit(0)
 
 
 if __name__ == '__main__':
@@ -131,16 +130,12 @@ if __name__ == '__main__':
 	server_sock = socket.socket()
 	server_sock.bind(('10.0.0.1', 80))
 	server_sock.listen(7)
-	
-	procs = []
 
 	while True:
-		client_sock, address = server_sock.accept()
-		procs.append(Process(target=handle_client, args=(client_sock, address, servers_handler)))
-		procs[-1].start()
-		for proc in procs:
-			if proc.is_alive():
-				proc.join()
+		clientsocket, address = server_sock.accept()
+		thread_id = os.fork()
+		if thread_id == 0:
+			handle_client(clientsocket, address, servers_handler)
 
 
 
