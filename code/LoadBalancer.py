@@ -105,6 +105,18 @@ class Servers:
 #		client_sock.sendall(data)
 #		client_sock.close()
 
+class ClientThread(threading.Thread):
+   def __init__(self, threadID, name, client_sock, address, servers_handler):
+      threading.Thread.__init__(self)
+      self.threadID = threadID
+	  self.name = name
+      self.client_sock = client_sock
+	  self.address = address
+	  self.servers_handler = servers_handler
+      
+   def run(self):
+      handle_client(self.client_sock, self.address, self.servers_handler)
+
 
 def handle_client(client_sock, address, servers_handler):
 	req = clientsocket.recv(1024)
@@ -130,12 +142,29 @@ if __name__ == '__main__':
 	server_sock = socket.socket()
 	server_sock.bind(('10.0.0.1', 80))
 	server_sock.listen(7)
+	
+	threads = []
+	ids = []
 
 	while True:
 		clientsocket, address = server_sock.accept()
-		thread_id = os.fork()
-		if thread_id == 0:
-			handle_client(clientsocket, address, servers_handler)
+		if len(ids) > 0:
+			id = ids.pop(0)
+		else:
+			id = len(threads)
+		
+		threads.append(ClientThread(id, 'thready', clientsocket, address, servers_handler))
+		threads[-1].start()
+		
+		for idx, thread in enumerate(threads):
+			to_remove = []
+			if not thread.isAlive():
+				ids.append(thread.threadID)
+				thread.join()
+				to_remove.append(idx)
+			
+			for idx in to_remove:
+				threads.pop(idx)
 
 
 
