@@ -19,7 +19,26 @@ def print_time(string):
 
 def createSocket(addr, port):
 	for af, socktype, proto, canonname, sa in socket.getaddrinfo(addr, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
-		new_sock = socket.socket(af, socktype, proto)
+		try:
+			new_sock = socket.socket(af, socktype, proto)
+		except socket.error as msg:
+			print_time(msg)
+			new_sock = None
+			continue
+		else:
+			try:
+				new_sock.connect(sa)
+			except socket.error as msg:
+				print_time(msg)
+				new_sock.close()
+				new_sock = None
+				continue
+			else:
+				break
+
+	if new_sock is None:
+		print_time('could not open socket')
+		sys.exit(1)
 	return new_sock
 
 
