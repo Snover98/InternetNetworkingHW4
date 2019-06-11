@@ -132,8 +132,6 @@ def handle_client(client_sock, address, servers_handler):
 	client_sock.sendall(data)
 	client_sock.close()
 
-	os._exit(0)
-
 
 if __name__ == '__main__':
 	print_time('LB Started')
