@@ -106,8 +106,8 @@ class Servers:
 #		client_sock.close()
 
 
-def handle_client(clientsocket, address, servers_handler):
-	req = clientsocket.recv(1024)
+def handle_client(client_sock, address, servers_handler):
+	req = client_sock.recv(1024)
 	msg = req.decode('utf-8')
 	req_type = msg[0]
 	req_time = int(msg[1])
