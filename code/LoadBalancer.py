@@ -141,7 +141,7 @@ if __name__ == '__main__':
 	servers_handler = Servers(servers, servers_work)
 	server_sock = socket.socket()
 	server_sock.bind(('10.0.0.1', 80))
-	server_sock.listen(7)
+	server_sock.listen(100024)
 	
 	threads = []
 	ids = []
