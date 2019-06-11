@@ -94,7 +94,7 @@ def handle_client(clientsocket, address):
 	req_type = req[0]
 	req_time = req[1]
 	serv_name = servers_handler.get_req_server(req_type, req_time)
-	print_time('recieved request %s from %s, sending to %s' % (req, address, servers_handler.get_server_addr(serv_name)))
+	print_time('recieved request %s from %s, sending to %s' % (req, address[0], servers_handler.get_server_addr(serv_name)))
 	serv_sock = servers_handler.get_server_socket(serv_name)
 	serv_sock.sendall(req)
 	data = serv_sock.recv(2)
