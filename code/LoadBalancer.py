@@ -19,7 +19,7 @@ def print_time(string):
 
 def createSocket(addr, port):
 	for af, socktype, proto, canonname, sa in socket.getaddrinfo(addr, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
-                new_sock = socket.socket(af, socktype, proto)
+		new_sock = socket.socket(af, socktype, proto)
 	return new_sock
 
 
@@ -90,10 +90,10 @@ servers_handler = Servers(servers, servers_work)
 
 
 def handle_client(clientsocket, address):
-        msg = clientsocket.recv(1024)
-        req_type = msg[0]
-        req_time = msg[1]
-        serv_name = servers_handler.get_req_server(req_type, req_time)
+	msg = clientsocket.recv(1024)
+	req_type = msg[0]
+	req_time = msg[1]
+	serv_name = servers_handler.get_req_server(req_type, req_time)
 	print_time('recieved request %s from %s, sending to %s' % (req, self.client_address[0], servers_handler.get_server_addr(serv_name)))
 	serv_sock = servers_handler.get_server_socket(serv_name)
 	serv_sock.sendall(req)
@@ -102,21 +102,21 @@ def handle_client(clientsocket, address):
 	client_sock.sendall(data)
 	client_sock.close()
 
-        os._exit(0)
+	os._exit(0)
 
 
 if __name__ == '__main__':
-        print_time('LB Started')
+	print_time('LB Started')
 	print_time('Connecting to servers')
 	server_sock = socket.socket()
 	server_sock.bind('10.0.0.1')
 	server_sock.listen()
 
 	while True:
-                clientsocket, address = server_sock.accept()
-                thread_id = os.fork()
-                if thread_id == 0:
-                        handle_client(clientsocket, address)
+		clientsocket, address = server_sock.accept()
+		thread_id = os.fork()
+		if thread_id == 0:
+			handle_client(clientsocket, address)
 
 
 
