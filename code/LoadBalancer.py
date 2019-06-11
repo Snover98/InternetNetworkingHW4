@@ -106,16 +106,16 @@ class Servers:
 #		client_sock.close()
 
 class ClientThread(threading.Thread):
-   def __init__(self, threadID, name, client_sock, address, servers_handler):
-      threading.Thread.__init__(self)
-      self.threadID = threadID
-	  self.name = name
-      self.client_sock = client_sock
-	  self.address = address
-	  self.servers_handler = servers_handler
+	def __init__(self, threadID, name, client_sock, address, servers_handler):
+		threading.Thread.__init__(self)
+		self.threadID = threadID
+		self.name = name
+		self.client_sock = client_sock
+		self.address = address
+		self.servers_handler = servers_handler
       
-   def run(self):
-      handle_client(self.client_sock, self.address, self.servers_handler)
+	def run(self):
+		handle_client(self.client_sock, self.address, self.servers_handler)
 
 
 def handle_client(client_sock, address, servers_handler):
